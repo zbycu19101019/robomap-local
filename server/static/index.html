@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f5f5" />
+  <title>RoboMap Local</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css?v=10.7" />
+<link rel="stylesheet" href="/neon.css?v=10.7" /><link rel="stylesheet" href="/xiaomi-home.css?v=3" /></head>
+<body data-page="control">
+  <div id="loadingOverlay" class="loading-overlay" aria-live="polite">
+    <div class="loader-robot">◉</div>
+    <strong>Łączenie z RoboMap Local…</strong>
+    <span>Serwer działa tylko w Twojej sieci lokalnej.</span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand-block">
+      <div class="brand-mark">R</div>
+      <div>
+        <div class="eyebrow">Twój inteligentny dom</div>
+        <h1>RoboMap <small>dla Xiaomi E5</small></h1>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="status-chip" id="connectionChip"><span id="connectionDot" class="status-dot connecting"></span><span id="connectionText">Łączenie…</span></div>
+      <div class="status-chip battery-chip"><span id="batteryIcon">▰</span><strong id="headerBattery">—</strong></div>
+      <div class="status-chip save-chip"><span id="saveState">zapisane</span></div>
+    </div>
+  </header>
+
+  <nav class="section-nav" aria-label="Sekcje RoboMap">
+    <button class="nav-btn active" data-page="control"><span>⌂</span><b>Dom</b></button>
+    <button class="nav-btn" data-page="map"><span>🗺</span><b>Mapa</b></button>
+    <button class="nav-btn" data-page="macros"><span>🎬</span><b>Makra</b></button>
+    <button class="nav-btn" data-page="automations"><span>⚡</span><b>Automatyzacje</b></button>
+    <button class="nav-btn" data-page="schedule"><span>◷</span><b>Harmonogram</b></button>
+    <button class="nav-btn" data-page="rc"><span>⌘</span><b>Pilot RC</b></button>
+    <button class="nav-btn" data-page="stats"><span>📊</span><b>Statystyki</b></button>
+    <button class="nav-btn" data-page="settings"><span>⚙</span><b>Ustawienia</b></button>
+  </nav>
+
+  <main class="app-grid">
+    <section class="neon-center">
+      <div class="mission-head"><div><span class="section-kicker">MÓJ DOM</span><h2>Czysto. Po prostu.</h2></div><span class="live-tag">● Panel lokalny</span></div>
+      <div class="telemetry-hud">
+        <div class="hud-coordinate top">UNIT / XIAOMI E5 <span>01</span></div>
+        <svg id="neonRobot" viewBox="0 0 500 420" role="img" aria-label="Model robota i wskaźnik baterii">
+          <defs>
+            <radialGradient id="robotMetal"><stop stop-color="#ffffff"/><stop offset=".8" stop-color="#f3f4f4"/><stop offset="1" stop-color="#dfe2e3"/></radialGradient>
+            <radialGradient id="floorGlow"><stop stop-color="#ff6900" stop-opacity=".18"/><stop offset="1" stop-color="#ff6900" stop-opacity="0"/></radialGradient>
+            <filter id="neonGlow"><feGaussianBlur stdDeviation="3"/></filter>
+          </defs>
+          <ellipse cx="250" cy="225" rx="205" ry="180" fill="url(#floorGlow)"/>
+          <g class="radar-orbit"><circle cx="250" cy="210" r="179" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="190 50 6 30" opacity=".55"/><path d="M250 25v12M250 383v12M65 210h12M423 210h12" stroke="currentColor" stroke-width="3"/></g>
+          <g class="radar-orbit reverse"><circle cx="250" cy="210" r="153" fill="none" stroke="currentColor" stroke-dasharray="2 13" stroke-width="4" opacity=".35"/></g>
+          <circle cx="250" cy="210" r="165" fill="none" stroke="#e9ecee" stroke-width="5"/>
+          <circle id="batteryArc" cx="250" cy="210" r="165" fill="none" stroke="#4affb1" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 250 210)"/>
+          <g class="suction-particles" fill="currentColor"><circle cx="130" cy="320" r="3"/><circle cx="350" cy="318" r="2"/><circle cx="200" cy="370" r="3"/><circle cx="285" cy="380" r="2"/><circle cx="100" cy="230" r="2"/><circle cx="399" cy="270" r="3"/></g>
+          <circle cx="250" cy="218" r="118" fill="#000" opacity=".06" filter="url(#neonGlow)"/>
+          <g class="robot-chassis"><circle cx="250" cy="210" r="109" fill="url(#robotMetal)" stroke="#d2d6d9" stroke-width="2"/><circle cx="250" cy="210" r="101" fill="none" stroke="#657d86" stroke-opacity=".35"/>
+          <path d="M153 184Q250 103 347 184" fill="none" stroke="#74949b" stroke-width="2"/><path d="M155 249Q250 310 345 249" fill="none" stroke="#060b10" stroke-width="4"/>
+          <rect x="228" y="130" width="44" height="29" rx="14" fill="#050c10" stroke="#3c626b"/><circle cx="242" cy="144" r="4" fill="#00f3ff"/><circle cx="258" cy="144" r="3" fill="#7a9298"/>
+          <text x="250" y="215" text-anchor="middle" fill="#d5e6e9" font-size="12" letter-spacing="5">XIAOMI</text><text x="250" y="235" text-anchor="middle" fill="#6e8a94" font-size="8" letter-spacing="3">VACUUM E5</text>
+          <path d="M310 303l22 28m-17-33l32 4m-37 4l-2 30" stroke="#56747a" stroke-width="3"/></g>
+        </svg>
+        <div id="hudAlarm" class="hud-alarm hidden" role="alert"><b>⚠ SYSTEM HALTED</b><span id="hudFault">Błąd urządzenia</span></div>
+        <div class="hud-readout"><span id="hudState">NAWIĄZYWANIE ŁĄCZNOŚCI</span><h3 id="hudTitle">Witaj na pokładzie</h3><p id="hudDetail">Telemetria pojawi się po połączeniu z robotem.</p></div>
+        <div class="hud-coordinate bottom"><span>ŁĄCZNOŚĆ / LAN</span><span>MIoT · ENCRYPTED</span></div>
+      </div>
+      <div class="neon-metrics"><div><span>ENERGIA</span><strong id="hudBattery">—<small>%</small></strong></div><div><span>ŁĄCZNY CZAS</span><strong id="xpMinutes">0<small> min</small></strong></div><div><span>POZIOM</span><strong id="xpLevel">01</strong></div></div>
+      <details class="more-tools"><summary>Osiągnięcia, głos i radar</summary>
+      <div class="neon-bottom"><section class="xp-card"><div class="section-kicker">Twoje osiągnięcia <span id="xpValue">0 EXP</span></div><h3 id="xpRank">Początkujący Miotłowy</h3><progress id="xpProgress" max="1" value="0"></progress><div id="xpNext" class="muted">1000 EXP do kolejnego poziomu</div><div id="achievements" class="achievements"><span>◇ Nocny Marek</span><span>◇ Maratończyk</span></div></section><section class="voice-card"><button id="voiceButton" class="voice-button" type="button">◎<span>Mikrofon</span></button><p id="voiceStatus">Powiedz: „sprzątaj” lub „wracaj do bazy”.</p><label class="check-row"><input type="checkbox" id="voiceCloud"/> Zezwól na usługę mowy przeglądarki</label></section></div>
+      <section class="radar-card"><div class="subcard-head"><div><span class="section-kicker">MAPOWANIE</span><h3>Radar przeszkód</h3></div><button id="radarReset">Wyzeruj</button></div><canvas id="radarCanvas" width="900" height="280" aria-label="Przybliżone położenie i zdarzenia zderzaka"></canvas><p id="radarNote" class="muted">Pozycja szacowana z czasu komend. To nie jest mapa LiDAR ani ochrona NO-GO.</p></section>
+      </details>
+    </section>
+    <section class="map-shell">
+      <div class="map-head">
+        <div>
+          <span class="section-kicker">MAPA MIESZKANIA</span>
+          <div class="map-title-row"><strong id="mapName">Mieszkanie</strong><span id="mapMeta">—</span></div>
+        </div>
+        <div class="map-view-actions">
+          <button id="zoomOut" class="icon-button" type="button" aria-label="Pomniejsz mapę">−</button>
+          <button id="zoomIn" class="icon-button" type="button" aria-label="Powiększ mapę">+</button>
+          <button id="fitMap" type="button">Dopasuj</button>
+        </div>
+      </div>
+
+      <div id="mapEditToolbar" class="map-edit-toolbar hidden" role="toolbar" aria-label="Narzędzia edycji mapy">
+        <button data-tool="select" class="tool active" type="button">↖ Wybierz</button>
+        <button data-tool="zone" class="tool" type="button">⛔ NO-GO</button>
+        <button data-tool="structure" class="tool" type="button">▰ Ściana domu</button>
+        <button data-tool="door" class="tool" type="button">🚪 Drzwi</button>
+        <button data-tool="wall" class="tool" type="button">⛔ Wirtualna</button>
+        <button data-tool="dock" class="tool" type="button">⌂ Baza</button>
+        <button data-tool="robot" class="tool" type="button">📍 Robot</button>
+        <button data-tool="pan" class="tool" type="button">✋ Przesuń</button>
+        <button id="roomplanImportBtn" class="tool" type="button">⬆ RoomPlan JSON</button>
+        <input id="roomplanFile" class="visually-hidden" type="file" accept="application/json,.json" />
+      </div>
+
+      <div id="mapWrap" class="map-wrap">
+        <svg id="mapSvg" viewBox="-1 -1 8 6" aria-label="Mapa mieszkania" tabindex="0">
+          <defs>
+            <pattern id="grid" width="0.5" height="0.5" patternUnits="userSpaceOnUse">
+              <path d="M .5 0 L 0 0 0 .5" class="grid-line" />
+            </pattern>
+          </defs>
+          <rect x="-100" y="-100" width="200" height="200" fill="url(#grid)" />
+          <g id="trailLayer"></g>
+          <g id="furnitureLayer"></g>
+          <g id="wallLayer"></g>
+          <g id="openingLayer"></g>
+          <g id="virtualWallLayer"></g>
+          <g id="zoneLayer"></g>
+          <g id="dockLayer"></g>
+          <g id="robotLayer"></g>
+          <g id="overlayLayer"></g>
+        </svg>
+
+        <div class="map-status-card">
+          <div class="map-status-top"><span id="mapStatusDot" class="status-dot connecting"></span><strong id="mapStatusText">Łączenie</strong></div>
+          <div class="map-status-meta"><span>🔋 <b id="mapBattery">—</b></span><span id="quietBadge" class="quiet-badge hidden">🌙 Cichy</span></div>
+          <div class="map-location-live">
+            <span id="mapPoseMode">NIEKALIBROWANA</span>
+            <strong id="mapCoordinates">—</strong>
+            <small>pewność <b id="mapPoseConfidence">0%</b></small>
+          </div>
+        </div>
+        <div id="offlineOverlay" class="offline-overlay hidden"><strong>Robot offline</strong><span>Sprawdź Wi‑Fi, IP robota i token miIO.</span><button id="configureTokenBtn" class="primary hidden" type="button">Dokończ AutoToken</button></div>
+        <div id="hint" class="map-hint">Mapa działa w trybie podglądu.</div>
+      </div>
+
+      <div class="map-footer">
+        <div class="map-footer-note"><span>Źródło: <b id="mapSource">—</b></span><span>Strefy NO-GO: <b id="zoneCount">0</b></span><span>Pozycja: <b id="mapPositionSource">—</b></span></div>
+        <div class="map-footer-actions">
+          <button id="reloadBtn" type="button">Odśwież</button>
+          <button id="deleteBtn" type="button" disabled>Usuń element</button>
+          <button id="saveBtn" class="primary" type="button">💾 Zapisz mapę</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="control-rail">
+      <section class="rail-panel active" data-panel="control">
+        <div class="panel-title-row"><div><span class="section-kicker">STEROWANIE</span><h2>Robot</h2></div><span id="robotStateBadge" class="state-badge">—</span></div>
+
+        <div class="robot-summary">
+          <div><span>Stan</span><strong id="stateText">—</strong></div>
+          <div><span>Bateria</span><strong id="batteryText">—</strong></div>
+          <div><span>Tryb</span><strong id="suctionLabel">Standard</strong></div>
+        </div>
+        <p id="robotDetail" class="muted compact"></p>
+
+        <div class="action-grid">
+          <button class="action start robot-command" data-robot="start" type="button"><span>▶</span>START</button>
+          <button class="action pause robot-command" data-robot="pause" type="button"><span>⏸</span>PAUZA</button>
+          <button class="action resume robot-command" data-robot="resume" type="button"><span>⏵</span>WZNÓW</button>
+          <button class="action stop robot-command" data-robot="stop" type="button"><span>■</span>STOP</button>
+          <button class="action dock robot-command" data-robot="dock" type="button"><span>⌂</span>BAZA</button>
+        </div>
+
+        <details id="manualDetails" class="more-tools"><summary>Pilot ręczny</summary>
+        <div class="subcard">
+          <div class="subcard-head"><strong>Pilot manualny</strong><span class="muted">Przytrzymaj = jedź, puść = stop</span></div>
+          <div class="manual-pad" aria-label="Sterowanie ręczne">
+            <span></span><button class="pad-btn robot-command" data-manual="forward" type="button" aria-label="Jedź do przodu">▲</button><span></span>
+            <button class="pad-btn robot-command" data-manual="left" type="button" aria-label="Skręć w lewo">◀</button><button class="pad-btn center-stop robot-command" data-manual="stop" type="button" aria-label="Zatrzymaj">■</button><button class="pad-btn robot-command" data-manual="right" type="button" aria-label="Skręć w prawo">▶</button>
+            <span></span><button class="pad-btn robot-command" data-manual="back" type="button" aria-label="Jedź do tyłu">▼</button><span></span>
+          </div>
+        </div>
+        </details>
+
+        <div class="subcard">
+          <div class="subcard-head"><strong>Moc ssania</strong></div>
+          <div class="segmented" id="suctionButtons">
+            <button class="robot-command" data-suction="0" type="button">Cicha</button>
+            <button class="robot-command active" data-suction="1" type="button">Standard</button>
+            <button class="robot-command" data-suction="2" type="button">Mocna</button>
+          </div>
+        </div>
+
+        <details id="extraControls" class="more-tools"><summary>Gamepad i tryb zabawy</summary>
+        <div class="subcard cat-card"><div class="subcard-head"><strong>CAT MODE</strong><span class="mini-badge">60 SEK</span></div><p class="muted compact">Krótkie losowe ruchy i moc Cicha. Używaj pod nadzorem, z dala od zwierzęcia.</p><div class="connection-actions"><button id="catStart">▷ Uruchom</button><button id="catStop">■ Zatrzymaj</button></div><p id="catStatus" class="muted compact">Gotowy do aktywacji</p></div>
+        <div class="subcard gamepad-card">
+          <div class="subcard-head"><strong>🎮 Gamepad</strong><span id="gamepadState" class="muted">Nieaktywny</span></div>
+          <label class="switch-row"><input id="gamepadEnabled" type="checkbox" /><span class="switch"></span><span>Włącz sterowanie padem</span></label>
+          <div class="rc-clean-status"><span class="rc-dot"></span><span id="gamepadRcState">Gotowy • gałka uruchamia szczotki automatycznie</span></div>
+          <p class="muted compact"><strong>Lewa gałka:</strong> góra = przód, dół = tył, lewo/prawo = obrót. Przy pierwszym ruchu RoboMap sam uruchamia szczotki + ssanie i włącza tryb cichy E5. Nie trzeba naciskać X.</p>
+          <p class="muted compact">B / ○ = STOP awaryjny, Start = zwykłe sprzątanie, Back/Share = baza.</p>
+        </div>
+        </details>
+
+        <button id="emergencyStop" class="emergency robot-command" type="button">🔴 AWARYJNY STOP</button>
+      </section>
+
+      <section class="rail-panel" data-panel="map">
+        <div class="panel-title-row"><div><span class="section-kicker">EDYCJA + POZYCJA</span><h2>Mapa domu</h2></div><span id="localizationBadge" class="state-badge">KALIBRUJ</span></div>
+        <p class="muted">Importuj geometrię z iPhone/RoomPlan albo popraw ją ręcznie. Ustaw bazę, a RoboMap będzie nakładał na tę samą mapę lokalną pozycję E5.</p>
+
+        <div class="subcard localization-card">
+          <div class="subcard-head"><strong>📍 Lokalizacja E5</strong><span class="muted">LIVE</span></div>
+          <p id="localizationState" class="muted compact">Pozycja nie jest jeszcze skalibrowana.</p>
+          <div class="connection-actions">
+            <button id="snapDockBtn" class="primary" type="button">⌂ Robot jest w bazie</button>
+            <button id="clearTrailBtn" type="button">🧹 Wyczyść ślad</button>
+          </div>
+          <p class="muted compact">Możesz też wybrać narzędzie <b>📍 Robot</b>, kliknąć jego rzeczywistą pozycję na mapie i przeciągnąć strzałkę w kierunku, w który jest zwrócony.</p>
+        </div>
+
+        <details class="more-tools"><summary>Historia mapy i przywracanie</summary>
+          <p class="muted">Poprzednie zapisy pozostają dostępne. Przywrócenie najpierw wczytuje wersję do edytora.</p>
+          <button id="mapHistoryLoad" type="button">Pokaż zapisane wersje</button>
+          <select id="mapHistorySelect" aria-label="Zapisana wersja mapy"></select>
+          <button id="mapHistoryRestore" type="button">Wczytaj wersję do edytora</button>
+        </details>
+        <form id="localizationConfigForm" class="form-grid subcard">
+          <section class="subcard" style="grid-column:1/-1">
+            <h3>Szkic mieszkania · LIVE</h3>
+            <button type="button" id="mappingPrepare" class="primary">1. Przygotuj mapowanie — zatrzymaj robota</button>
+            <p id="mappingGuide" role="status" class="muted">2. Wskaż pozycję i kierunek robota na mapie. 3. Rozpocznij zapis i prowadź pilotem.</p>
+            <p class="muted">Prowadź robota pilotem. Zgłoszenia zablokowanego zderzaka zapiszą się automatycznie. Zwykłe dotknięcie przeszkody zaznacz przyciskiem poniżej.</p>
+            <div class="connection-actions"><button type="button" id="surveyStart">Rozpocznij zapis</button><button type="button" id="surveyPause">Wstrzymaj zapis</button><button type="button" id="surveyContact">Przeszkoda przed robotem</button></div>
+            <p id="surveyState" aria-live="polite">Wczytuję pomiary…</p>
+            <label><input type="checkbox" id="surveyVisible" checked> Pokaż pomiary i szkic ścian</label>
+            <div class="connection-actions"><button type="button" id="surveyAccept">Dodaj szkic ścian do edytora</button><button type="button" id="surveyExport">Eksportuj pomiary JSON</button></div>
+            <p class="muted">Czerwone punkty: szacowane przeszkody. Żółte linie: automatyczne propozycje ścian z co najmniej 3 bliskich pomiarów. Popraw szkic przed zapisaniem mapy. Zapis nie uruchamia jazdy. E5 nie przekazuje dokładnego XY ani skanu ścian podczas samodzielnego sprzątania.</p>
+          </section>
+          <div class="subcard-head"><strong>Kalibracja odometrii</strong><span class="muted">dla pada / D-pada</span></div>
+          <div class="two-col">
+            <label>Jazda [cm/s]<input id="linearSpeed" type="number" min="3" max="50" step="0.5" value="10" /></label>
+            <label>Obrót [°/s]<input id="turnRate" type="number" min="20" max="360" step="5" value="90" /></label>
+          </div>
+          <button type="submit">Zapisz kalibrację ruchu</button>
+        </form>
+
+        <div id="nothingSelected" class="empty-state">Dotknij strefy NO-GO, aby ją edytować.</div>
+        <form id="zoneForm" class="form-grid hidden">
+          <label>Nazwa<input id="zoneName" type="text" maxlength="80" /></label>
+          <div class="two-col">
+            <label>X [m]<input id="zoneX" type="number" step="0.01" /></label>
+            <label>Y [m]<input id="zoneY" type="number" step="0.01" /></label>
+            <label>Szer. [m]<input id="zoneW" type="number" min="0.05" step="0.01" /></label>
+            <label>Wys. [m]<input id="zoneH" type="number" min="0.05" step="0.01" /></label>
+          </div>
+          <button type="submit">Zastosuj wartości</button>
+        </form>
+        <div class="info-box warning-box"><strong>Dokładność E5</strong><span>W bazie pozycja jest kotwiczona do stacji. Podczas sterowania przez RoboMap pozycja jest liczona z czasu jazdy i skrętu. Przy zwykłym autonomicznym sprzątaniu E5 nie udostępnia XY, więc RoboMap pokazuje ostatnią znaną pozycję i obniża jej pewność zamiast udawać dokładny GPS.</span></div>
+      </section>
+
+      <section class="rail-panel" data-panel="macros">
+        <div class="panel-title-row"><div><span class="section-kicker">SEKWENCJE</span><h2>Makra ruchu</h2></div><span id="macroRecordBadge" class="state-badge">Gotowe</span></div>
+        <label class="field">Nazwa makra<input id="macroName" type="text" maxlength="80" value="Pod stołem" /></label>
+        <div class="macro-record-actions">
+          <button id="macroRecordStart" class="primary" type="button">⏺ Nagrywaj</button>
+          <button id="macroRecordStop" type="button" disabled>■ Zapisz</button>
+          <button id="macroRecordCancel" type="button" disabled>Anuluj</button>
+        </div>
+        <div class="record-meter"><span id="macroTimer">00:00.0</span><span id="macroStepCount">0 komend</span></div>
+        <div class="info-box"><strong>Jak nagrywać</strong><span>Włącz nagrywanie, wróć do zakładki Dom i steruj D-padem albo padem. Maksymalnie 60 sekund. Makro zawsze kończy się STOP.</span></div>
+        <div class="list-head"><strong>Zapisane makra</strong><button id="stopMacroPlayback" type="button">■ Przerwij odtwarzanie</button></div>
+        <div id="macroList" class="macro-list"></div>
+      </section>
+
+      <section class="rail-panel" data-panel="automations">
+        <div class="panel-title-row"><div><span class="section-kicker">REGUŁY</span><h2>Automatyzacje</h2></div></div>
+        <form id="automationForm" class="automation-form">
+          <div class="subcard">
+            <div class="subcard-head"><strong>💻 Win+L → sprzątanie</strong><span id="presenceState" class="muted">—</span></div>
+            <label class="switch-row"><input id="lockEnabled" type="checkbox" /><span class="switch"></span><span>Uruchom po zablokowaniu Windows</span></label>
+            <div class="two-col">
+              <label>Opóźnienie [s]<input id="lockDelay" type="number" min="5" max="3600" value="120" /></label>
+              <label>Min. bateria [%]<input id="minBattery" type="number" min="0" max="100" value="30" /></label>
+            </div>
+            <label class="check-row"><input id="dockOnUnlock" type="checkbox" checked /> Po odblokowaniu wyślij robota do bazy</label>
+          </div>
+          <div class="subcard">
+            <div class="subcard-head"><strong>🌙 Tryb nocny</strong><span id="quietState" class="muted">—</span></div>
+            <label class="switch-row"><input id="quietEnabled" type="checkbox" /><span class="switch"></span><span>Włącz reguły nocne</span></label>
+            <div class="two-col">
+              <label>Od<input id="quietStart" type="time" value="22:00" /></label>
+              <label>Do<input id="quietEnd" type="time" value="07:00" /></label>
+            </div>
+            <label class="check-row"><input id="quietForce" type="checkbox" checked /> Gdy robot sprząta, wymuszaj tryb Cicha</label>
+            <label class="check-row"><input id="quietBlockLock" type="checkbox" checked /> Nie uruchamiaj sprzątania przez Win+L w godzinach ciszy</label>
+          </div>
+          <button class="primary wide" type="submit">💾 Zapisz automatyzacje</button>
+        </form>
+      </section>
+
+      <section class="rail-panel" data-panel="schedule"><span class="section-kicker">PLAN MISJI</span><h2>Harmonogram</h2><p class="muted compact">Działa, gdy komputer i RoboMap są włączone. Cisza nocna i niski poziom baterii blokują zaplanowany start.</p><form id="scheduleForm"><label>Godzina<input id="scheduleTime" type="time" value="09:00" required></label><div class="schedule-days"><label><input type="checkbox" name="scheduleDay" value="0">Pn</label><label><input type="checkbox" name="scheduleDay" value="1">Wt</label><label><input type="checkbox" name="scheduleDay" value="2">Śr</label><label><input type="checkbox" name="scheduleDay" value="3">Cz</label><label><input type="checkbox" name="scheduleDay" value="4">Pt</label><label><input type="checkbox" name="scheduleDay" value="5">So</label><label><input type="checkbox" name="scheduleDay" value="6">Nd</label></div><label>Polecenie<select id="scheduleAction"><option value="start">Rozpocznij sprzątanie</option><option value="dock">Powrót do bazy</option><option value="pause">Pauza</option></select></label><button class="primary wide">Dodaj termin</button></form><div id="scheduleList"></div><h3>Profile</h3><p class="muted compact">Profil zmienia moc oraz automatyzację Win+L i ciszę nocną.</p><div class="profile-buttons"><button data-profile="normal">Normalny</button><button data-profile="night">Nocny</button><button data-profile="away">Nie ma mnie</button></div></section>
+      <section class="rail-panel" data-panel="stats">
+        <div class="panel-title-row"><div><span class="section-kicker">BLACKBOX</span><h2>Statystyki</h2></div><button id="refreshStats" type="button">Odśwież</button></div>
+        <div class="stats-grid">
+          <div class="stat-card"><span>Sprzątania</span><strong id="statRuns">0</strong><small>ostatnie 30 dni</small></div>
+          <div class="stat-card"><span>Czas pracy</span><strong id="statMinutes">0 min</strong><small>sprzątanie</small></div>
+          <div class="stat-card"><span>Komendy</span><strong id="statCommands">0</strong><small>lokalne</small></div>
+          <div class="stat-card"><span>Błędy</span><strong id="statErrors">0</strong><small>zarejestrowane</small></div>
+        </div>
+        <div class="subcard"><div class="subcard-head"><strong>Ostatnie 7 dni</strong><span class="muted">minuty sprzątania</span></div><div id="weekChart" class="week-chart"></div></div>
+        <div class="subcard"><div class="subcard-head"><strong>Dziennik pokładowy</strong><span class="muted">SQLite • robomap.db</span></div><div id="historyList" class="history-list"></div></div>
+      </section>
+
+      <section class="rail-panel settings-panel" data-panel="settings">
+        <div class="panel-title-row settings-title"><div><span class="section-kicker">KONFIGURACJA</span><h2>Połączenie z E5</h2></div><span id="setupOverallBadge" class="state-badge">AUTO</span></div>
+
+        <div class="setup-hero">
+          <div class="setup-hero-icon">🤖</div>
+          <div class="setup-hero-copy">
+            <strong id="setupHeroTitle">RoboMap sam skonfiguruje robota</strong>
+            <span id="setupHeroText">Najpierw znajdujemy E5 w LAN, potem automatycznie pozyskujemy token z bezpiecznego źródła.</span>
+          </div>
+          <div class="setup-hero-state" id="setupHeroState">SZUKAM</div>
+        </div>
+
+        <div class="setup-steps" aria-label="Postęp konfiguracji">
+          <div class="setup-step" id="stepLan"><span class="step-index">1</span><div><b>E5 w sieci</b><small id="stepLanText">Wykrywanie…</small></div></div>
+          <div class="setup-connector"></div>
+          <div class="setup-step" id="stepToken"><span class="step-index">2</span><div><b>Token miIO</b><small id="stepTokenText">Oczekiwanie</small></div></div>
+          <div class="setup-connector"></div>
+          <div class="setup-step" id="stepReady"><span class="step-index">3</span><div><b>Gotowe</b><small id="stepReadyText">Sterowanie LAN</small></div></div>
+        </div>
+
+        <div class="subcard discovery-card polished-card">
+          <div class="subcard-head"><div><strong>✨ AutoPair LAN</strong><span class="card-subtitle">Robot dodaje się sam w bieżącej sieci</span></div><span id="autoDiscoveryBadge" class="mini-badge">LAN</span></div>
+          <label class="switch-row"><input id="autoDiscoveryEnabled" type="checkbox" checked /><span class="switch"></span><span>Automatycznie wykrywaj mój Xiaomi Robot Vacuum E5</span></label>
+          <div class="compact-actions"><button id="autoDiscoverBtn" type="button" class="primary">Skanuj teraz</button><span id="autoDiscoverState" class="inline-state">Skan jeszcze nie został wykonany.</span></div>
+          <div id="autoDiscoverCandidates" class="candidate-list"></div>
+          <details class="tech-details"><summary>Szczegóły badawcze</summary><p>RoboMap używa broadcast/unicast miIO, mDNS i ograniczonego skanu prywatnego LAN. Nie skanuje Internetu.</p></details>
+        </div>
+
+        <div id="cloudTokenCard" class="subcard token-bootstrap-card polished-card">
+          <div class="subcard-head"><div><strong>🔑 AutoToken</strong><span class="card-subtitle">Token bez ręcznego przepisywania</span></div><span id="cloudTokenBadge" class="mini-badge">AUTO</span></div>
+          <div class="autotoken-status" id="autoTokenVisual">
+            <span class="autotoken-orb waiting" id="autoTokenOrb">🔐</span>
+            <div><strong id="autoTokenHeadline">Sprawdzam źródła tokenu…</strong><span id="cloudTokenState">Jeśli sparowany E5 ukrywa token w LAN, RoboMap może pobrać go automatycznie z Twojego konta Xiaomi.</span></div>
+          </div>
+          <div id="cloudTokenLocalOnly" class="privacy-strip"><span>🛡</span><div><b>Autoryzacja tylko lokalnie</b><small>Dane logowania są przyjmowane wyłącznie przez Launcher / 127.0.0.1.</small></div></div>
+          <form id="cloudTokenForm" class="form-grid token-form">
+            <div class="two-col token-account-grid">
+              <label>Konto Xiaomi<input id="xiaomiUsername" type="text" autocomplete="username" placeholder="e-mail / numer / Xiaomi ID" /></label>
+              <label>Region Xiaomi Home
+                <select id="xiaomiRegion">
+                  <option value="all" selected>Automatycznie — wszystkie regiony</option>
+                  <option value="de">Niemcy / Europa (de)</option>
+                  <option value="cn">Chiny (cn)</option>
+                  <option value="i2">Indie (i2)</option>
+                  <option value="ru">Rosja (ru)</option>
+                  <option value="sg">Singapur (sg)</option>
+                  <option value="us">USA (us)</option>
+                </select>
+              </label>
+            </div>
+            <label>Hasło Xiaomi<input id="xiaomiPassword" type="password" autocomplete="current-password" placeholder="Tylko do jednorazowego pobrania tokenu" /></label>
+            <label class="check-row secure-remember"><input id="xiaomiRemember" type="checkbox" /> Zapamiętaj autoryzację zaszyfrowaną przez Windows DPAPI, aby RoboMap sam odzyskał token po ponownym sparowaniu/resetowaniu robota.</label>
+            <div class="token-action-row">
+              <button id="cloudTokenBtn" class="primary" type="submit">Pobierz token automatycznie</button>
+              <button id="cloudTokenRetryBtn" type="button">Ponów AutoToken</button>
+              <button id="cloudTokenForgetBtn" type="button" class="quiet-action">Usuń autoryzację</button>
+            </div>
+          </form>
+          <details class="tech-details"><summary>Dlaczego potrzebne jest konto?</summary><p>Już sparowany E5 może zwracać w lokalnym handshake same znaki FF zamiast sekretu. Wtedy tokenu nie da się wyliczyć z LAN. RoboMap pobiera go z Twojego autoryzowanego konta, zapisuje token lokalnie i dalej steruje robotem bezpośrednio przez Wi‑Fi/LAN.</p></details>
+        </div>
+
+        <details class="advanced-connection">
+          <summary>Zaawansowane ustawienia połączenia</summary>
+          <form id="connectionForm" class="form-grid advanced-form">
+            <label>IP robota<input id="robotIp" type="text" inputmode="decimal" placeholder="Wykrywane automatycznie" autocomplete="off" /></label>
+            <label>Token miIO
+              <div class="password-wrap"><input id="robotToken" type="password" placeholder="Wykrywany automatycznie — ręczne pole awaryjne" autocomplete="off" /><button id="toggleToken" type="button" aria-label="Pokaż lub ukryj token">👁</button></div>
+            </label>
+            <div class="connection-actions"><button type="submit">Zapisz ręcznie</button><button id="testConnectionBtn" type="button">Testuj połączenie</button></div>
+            <div id="connectionState" class="muted">—</div>
+          </form>
+        </details>
+
+        <div class="subcard network-card"><div class="subcard-head"><strong>📱 Dostęp w domu</strong><span class="mini-badge">LAN</span></div><p class="muted compact">Telefon lub laptop w tej samej sieci otworzy dokładnie ten sam panel.</p><code id="currentUrl" class="url-box"></code></div>
+      </section>
+    </aside>
+  </main>
+
+  <button id="globalStop" class="global-stop">■ AWARYJNY STOP</button><button id="unlockControl" class="unlock-control hidden">Odblokuj sterowanie</button><div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js?v=10.7-simple" defer></script>
+<script src="/neon.js?v=10.7" defer></script><script src="/rules-ui.js?v=1" defer></script></body>
+</html>
