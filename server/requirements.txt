@@ -1,0 +1,11 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+pydantic>=2.8,<3
+# PyPI has no stable 0.6.0 release. The E5 backend uses the generic MIoT API
+# from the 0.6.0.dev0 pre-release, so pin it explicitly.
+python-miio==0.6.0.dev0
+
+micloud>=0.6
+
+pystray>=0.19,<1
+Pillow>=10,<13
